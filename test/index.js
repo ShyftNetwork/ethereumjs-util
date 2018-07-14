@@ -1,5 +1,5 @@
 var assert = require('assert')
-var ethUtils = require('../index.js')
+var ethUtils = require('../dist/index.js')
 var BN = require('bn.js')
 
 describe('zeros function', function () {
@@ -29,29 +29,38 @@ describe('is zero address', function () {
   })
 })
 
-describe('sha3', function () {
-  it('should produce a sha3', function () {
+describe('keccak', function () {
+  it('should produce a hash', function () {
     var msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     var r = '82ff40c0a986c6a5cfad4ddf4c3aa6996f1a7837f9c398e17e5de5cbd5a12b28'
-    var hash = ethUtils.sha3(msg)
+    var hash = ethUtils.keccak(msg)
     assert.equal(hash.toString('hex'), r)
   })
 })
 
-describe('sha3 without hexprefix', function () {
-  it('should produce a sha3', function () {
+describe('keccak256', function () {
+  it('should produce a hash (keccak(a, 256) alias)', function () {
+    var msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
+    var r = '82ff40c0a986c6a5cfad4ddf4c3aa6996f1a7837f9c398e17e5de5cbd5a12b28'
+    var hash = ethUtils.keccak256(msg)
+    assert.equal(hash.toString('hex'), r)
+  })
+})
+
+describe('keccak without hexprefix', function () {
+  it('should produce a hash', function () {
     var msg = '3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     var r = '22ae1937ff93ec72c4d46ff3e854661e3363440acd6f6e4adf8f1a8978382251'
-    var hash = ethUtils.sha3(msg)
+    var hash = ethUtils.keccak(msg)
     assert.equal(hash.toString('hex'), r)
   })
 })
 
-describe('sha3-512', function () {
-  it('should produce a sha3', function () {
+describe('keccak-512', function () {
+  it('should produce a hash', function () {
     var msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     var r = '36fdacd0339307068e9ed191773a6f11f6f9f99016bd50f87fd529ab7c87e1385f2b7ef1ac257cc78a12dcb3e5804254c6a7b404a6484966b831eadc721c3d24'
-    var hash = ethUtils.sha3(msg, 512)
+    var hash = ethUtils.keccak(msg, 512)
     assert.equal(hash.toString('hex'), r)
   })
 })
@@ -82,7 +91,7 @@ describe('ripemd160', function () {
 })
 
 describe('rlphash', function () {
-  it('should produce a sha3 of the rlp data', function () {
+  it('should produce a keccak-256 hash of the rlp data', function () {
     var msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     var r = '33f491f24abdbdbf175e812b94e7ede338d1c7f01efb68574acd279a15a39cbe'
     var hash = ethUtils.rlphash(msg)
@@ -411,11 +420,17 @@ describe('isPrecompiled', function () {
     assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000002'), true)
     assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000003'), true)
     assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000004'), true)
+    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000005'), true)
+    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000006'), true)
+    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000007'), true)
+    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000008'), true)
+    assert.equal(ethUtils.isPrecompiled(Buffer.from('0000000000000000000000000000000000000001', 'hex')), true)
   })
   it('should return false', function () {
     assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000000'), false)
-    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000005'), false)
+    assert.equal(ethUtils.isPrecompiled('0000000000000000000000000000000000000009'), false)
     assert.equal(ethUtils.isPrecompiled('1000000000000000000000000000000000000000'), false)
+    assert.equal(ethUtils.isPrecompiled(Buffer.from('0000000000000000000000000000000000000000', 'hex')), false)
   })
 })
 
@@ -589,7 +604,12 @@ describe('message sig', function () {
   const s = Buffer.from('129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca66', 'hex')
 
   it('should return hex strings that the RPC can use', function () {
-    assert.equal(ethUtils.toRpcSig(27, r, s), '0x99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca6600')
+    assert.equal(ethUtils.toRpcSig(27, r, s), '0x99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca661b')
+    assert.deepEqual(ethUtils.fromRpcSig('0x99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca661b'), {
+      v: 27,
+      r: r,
+      s: s
+    })
     assert.deepEqual(ethUtils.fromRpcSig('0x99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca6600'), {
       v: 27,
       r: r,
@@ -607,7 +627,7 @@ describe('message sig', function () {
   })
 
   it('pad short r and s values', function () {
-    assert.equal(ethUtils.toRpcSig(27, r.slice(20), s.slice(20)), '0x00000000000000000000000000000000000000004a1579cf389ef88b20a1abe90000000000000000000000000000000000000000326fa689f228040429e3ca6600')
+    assert.equal(ethUtils.toRpcSig(27, r.slice(20), s.slice(20)), '0x00000000000000000000000000000000000000004a1579cf389ef88b20a1abe90000000000000000000000000000000000000000326fa689f228040429e3ca661b')
   })
 
   it('should throw on invalid v value', function () {

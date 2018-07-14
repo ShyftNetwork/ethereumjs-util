@@ -1,5 +1,5 @@
 var assert = require('assert')
-var ethUtil = require('../index.js')
+var ethUtil = require('../dist/index.js')
 
 describe('define', function () {
   const fields = [{
@@ -29,7 +29,7 @@ describe('define', function () {
   it('should trim zeros', function () {
     var someOb = {}
     ethUtil.defineProperties(someOb, fields)
-      // Define Properties
+    // Define Properties
     someOb.r = '0x00004'
     assert.equal(someOb.r.toString('hex'), '04')
 
