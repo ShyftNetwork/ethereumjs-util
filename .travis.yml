@@ -1,34 +1,32 @@
 language: node_js
 node_js:
-  - "4"
-  - "6"
-  - "8"
+- '4'
+- '6'
+- '8'
 env:
-  - CXX=g++-4.8
+  global:
+  - DISPLAY=:99.0
+  matrix:
+  - CXX=g++-4.8 TEST_SUITE=test:node
 addons:
-  firefox: "latest"
+  firefox: latest
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
 before_install:
-  - sh -e /etc/init.d/xvfb start
-env:
-  global:
-    - DISPLAY=:99.0
-  matrix:
-    - CXX=g++-4.8 TEST_SUITE=test:node
+- sh -e /etc/init.d/xvfb start
 matrix:
   fast_finish: true
   include:
-    - os: linux
-      node_js: "8"
-      env: CXX=g++-4.8 TEST_SUITE=coveralls
-    - os: linux
-      node_js: "8"
-      env: CXX=g++-4.8 TEST_SUITE=lint
-    - os: linux
-      node_js: "8"
-      env: CXX=g++-4.8 TEST_SUITE=test:browser
+  - os: linux
+    node_js: '8'
+    env: CXX=g++-4.8 TEST_SUITE=lint
+  - os: linux
+    node_js: '8'
+    env: CXX=g++-4.8 TEST_SUITE=test:browser
 script: npm run $TEST_SUITE
+notifications:
+  slack:
+    secure: lD9XIeVs9zufd1gOu6fhHP3ORwbGR93EHv97pAghjyAvERr66wzsJAYPgk4iWQ2Q5v4OxUQkhqQPw2D6h2NbN2qq3GU0EesRvd10BnpYV55DyvE/1Ez/Mp+GA3ytVuGcNKFgNxPrKu5frRzKPC/yZW5PejngL3BWOFm7P2EfYpAS5pYwj1WIYNBSF63zV08okbzvWaYTNPX7/rRKp1nqgD2eQadBCNCODhy9kvc14J0iuR9f3cFUTHdi79+at47H8x9Zs0kJbwYoAx4IwBPjV1z1b2rNbdj0z7fcxHdzeqXgjR1B8GSMkoS4W5JWrbC2B89Slrab715fvSJk/L9aJf0S2f8eXOPUYzJ8seD/lYb7vo7XeFNC/ZMHYwzXzSUsoM8JRF+eUkF7WsVzrtEUYhliqgioCGp3VoSZy899BOAWMuNmG1Jt8pb2HGbR7aKR/YFn2YMsd4QC0XL/VUzdfDQgNIgaMp1Ue4iLDvzyo//arC62l4JwxFssqtsuSSnJnGMYu7TwOJgkRx2lQYc4sIwmGnCPhYfPvHzMbZFK87lvMugVJ3QsNhDf0uMQQIEOVwLWeg5xIdyEe/cKE6m+C/sQpGurlXuMnsSoGYl0JQ5mV0u0j2fRGY7ULJ4U9waJZQHWaS57VDgdQYxLc9uEw7I7Q8B1b3OdGT9HNnCxhhg=
